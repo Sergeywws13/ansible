@@ -1,0 +1,28 @@
+--- 
+  - name: off file transfer
+    set_fact:
+      client: "#"
+    when: file == "no"  
+
+  - name: on file transfer
+    set_fact:
+      client: ""
+    when: file != "no"  
+
+  - name: off gzip
+    set_fact:
+      gzip: "#"
+    when: compression == "no"  
+
+  - name: on gzip
+    set_fact:
+      gzip: ""
+    when: compression != "no"
+  
+  - name: Generate nginx.conf
+    ansible.builtin.template: 
+      src: /home/evgen/ansible/templates/nginx_conf/nginx.conf.j2
+      dest: /home/evgen/nginx/nginx.conf
+    register: out
+
+    

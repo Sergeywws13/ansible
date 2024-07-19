@@ -1,0 +1,64 @@
+version: '2.0'
+
+
+services:
+
+  #proxy:
+   # image: jwilder/nginx-proxy
+    #ports:
+     # - {{ports}}:80
+    #volumes:
+     # - /var/run/docker.sock:/tmp/docker.sock:ro
+    #networks:
+      #- proxy
+  
+  nginx:
+    image: nginx
+    environment:
+      - VIRTUAL_HOST={{ site }}
+    ports:
+      - {{ports}}:80
+    depends_on:
+      - php
+    volumes:
+      - {{HOME}}/files/conf.d/:/etc/nginx/conf.d/
+      - {{HOME}}/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - {{HOME}}/files/html/:/var/www/html/
+    networks:
+      - proxy
+      - backend
+
+  php:
+    build:
+      context: {{HOME}}/files
+    volumes:
+      #- {{HOME}}/files/php/php.ini:/usr/local/etc/php/php.ini
+      - {{HOME}}/files/html/:/var/www/html/
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - /etc/data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - backend
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      - VIRTUAL_HOST={{ base }}
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+    networks:
+      - proxy
+      - backend
+
+networks:
+  proxy:
+    driver: bridge
+  backend:
+

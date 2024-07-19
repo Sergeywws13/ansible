@@ -1,0 +1,9 @@
+- hosts: webservers                                                                                                                                                 
+  become: yes 
+  become_user: root
+  become_method: sudo
+  tasks:
+  - name: Include the docker_install role
+    include_role:
+      name: docker_install
+

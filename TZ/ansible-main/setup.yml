@@ -1,0 +1,50 @@
+---
+- hosts: webservers                                                                                                                                                 
+  become: yes 
+  become_user: root
+  become_method: sudo
+  vars_prompt:
+
+    - name: ports
+      prompt: Choice the port
+      private: false
+      default: 80
+      
+    - name: site
+      prompt: Choice the site name
+      private: false
+      default: localhost   
+
+    - name: base
+      prompt: Choice the url to phpadmin panel
+      private: false
+      default: 127.0.0.1
+
+    - name: file
+      prompt: Allow file transfer?
+      private: false
+      default: "no"
+      
+    - name: compression
+      prompt: Allow gzip compression?
+      private: false
+      default: "no"   
+      
+      
+  tasks:
+
+  - name: git role
+    include_role:
+      name: git
+  - name: nginx generate
+    include_role:
+      name: nginx
+  - name: docker generate and up
+    include_role:
+      name: template_dock
+
+  - name: Restart services
+    community.docker.docker_compose_v2:
+      project_src: "{{ HOME }}/dock/"
+      state: restarted
+    when: out.changed == true and info.changed == true    
